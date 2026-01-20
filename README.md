@@ -1,55 +1,127 @@
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://vshymanskyy.github.io/StandWithUkraine/)
 
-# Backstory
-Initially I wrote this program for myself since I bought my first Macbook and quickly realized that I can't use 'Alt'+Shift to change language on macOS. 
-After a while a friend of mine bought his first Macbook and asked me "How can I change language using 'Alt'+Shift? I can't seem to change it in system preferences". I shared my app with him and at that point I realized that other people might find it useful as well so decided to share this app with the world.
+# CommandShift Fork with Fn Screenshot Shortcuts
 
-# CommandShift
-CommandShift is a free and open-source app that allows you to change input source using Windows-style shortcut (e.g. Command + Shift, Option + Shift, Control + Shift, Fn + Shift or even just Shift. It's quite customizable). 
+> [!NOTE]
+> This is a fork of [VasylBaran/CommandShift](https://github.com/VasylBaran/CommandShift) with additional **Fn key screenshot shortcuts** feature.
+
+## 🆕 New Feature: Fn Screenshot Shortcuts
+
+This fork adds a new feature that allows the **Fn key** to trigger macOS screenshot shortcuts:
+
+- **Short press** (< 500ms): `Command + Shift + 4` → Area screenshot tool
+- **Long press** (≥ 500ms): `Command + Shift + 5` → Screenshot control panel
+
+### How to Use
+1. Install and launch CommandShift
+2. Click the menu bar icon (CS)
+3. Check **"Enable Fn screenshot shortcuts"**
+4. Now you can use Fn key for quick screenshots!
+
+### Why This Feature?
+Makes taking screenshots much faster and more convenient - no need to remember complex keyboard combinations or reach for multiple keys simultaneously.
+
+---
+
+## Original CommandShift Features
+
+CommandShift is a free and open-source app that allows you to change input source using Windows-style shortcuts (e.g. Command + Shift, Option + Shift, Control + Shift, or even just Shift). 
+
 By default MacOS doesn't support shortcuts that consist of modifier keys only. CommandShift solves this problem.
 
-# Support 
-I'm a single software engineer from Ukraine. If you found CommandShift useful and would like to say 'thank you' please consider supporting me on [Patreon](https://www.patreon.com/Vasyl_Baran) or [PayPal](https://www.paypal.com/donate/?hosted_button_id=WZAJV3PYPWUHA). It encourages me to further improve, support and update CommandShift as new versions of MacOS come out. 
+## How-to Install
 
-**My current goal is $99 which is a membership fee for Apple Developer program** so that I can propertly sign and notarize CommandShift using Apple developer certificate.
-# How-to use
+### Download Pre-built DMG
+Check the [Releases](https://github.com/treshhh313/CommandShiftFN/releases) page for the latest build.
+
+### Build from Source
+```bash
+# Prerequisites: Qt 5 or Qt 6, qmake, Xcode Command Line Tools
+git clone https://github.com/treshhh313/CommandShiftFN.git
+cd CommandShiftFN/src
+qmake CommandShift.pro
+make
+```
+
+### Installation Steps
 1. Download CommandShift-universal.dmg
 2. Drag'n'drop CommandShift application from dmg-file to your Applications folder
-3. Add CommandShift to "Security & Privacy -> Privacy -> Accessibility" in order for it to work properly
+3. Add CommandShift to **"System Settings → Privacy & Security → Accessibility"** for it to work properly
 4. Enjoy!
-5. (optionally) Add CommandShift to your startup items ("Users & Groups -> Login Items")
+5. (Optional) Add CommandShift to your startup items ("System Settings → General → Login Items")
 
-# FAQ:
-* **Q:** I've upgraded to macOS Tahoe and now language input source changes by itself
-* **A:** Try CommandShift v1.05 ;-)
-* **Q:** I've added CommandShift to "Security & Privacy -> Privacy -> Accessibility" but it doesn't work =(
-* **A:** Please make sure that your settings in "Keyboard -> Shortcuts -> Input Sources" are set to default (you can easily do that by pressing "Restore Defaults" button there)
+## Features
+
+✅ **Language Switching:**
+- Switch languages with Windows-style shortcuts
+- Choose from: Shift + Control, Shift + Option, Shift + Command, or just Shift
+- Option to switch language on key press or release
+
+✅ **Fn Screenshot Shortcuts (New!):**
+- Quick tap Fn → Area screenshot (Command+Shift+4)
+- Hold Fn → Screenshot menu (Command+Shift+5)
+- Toggle on/off via menu
+
+✅ **Customization:**
+- Hide tray icon permanently or temporarily
+- White icon option for better visibility
+- Settings persist across restarts
+
+✅ **Universal Binary:**
+- Runs natively on both Intel and Apple Silicon Macs
+
+## FAQ
+
+### Fn Screenshot Feature
+
+* **Q:** Fn key is not triggering screenshots
+* **A:** Make sure the feature is enabled in the menu AND CommandShift has Accessibility permissions in System Settings
+
+* **Q:** Can I adjust the timing threshold?
+* **A:** Currently it's 500ms (hardcoded). You can modify it in the source code and rebuild.
+
+### Original FAQ
+
 * **Q:** How do I choose which shortcut should switch language?
-* **A:** Find CommandShift ('CS' icon) in menu bar at the top-right and click on it, there you'll find "Change language with..." drop-down. Select the one you prefer =) 
-* **Q:** I get "CommandShift is damaged and can't be opened" error
-* **A:** Please run this command in Terminal: _xattr -cr /Applications/CommandShift.app_
-* **Q:** How to automatically launch CommandShift when computer starts?
-* **A:** You can add CommandShift to your list of auto-start items by opening System Settings panel -> Users and Groups OR General (depending on what version of macOS you're using) -> Login Items -> [+] -> [select CommandShift app]
-* **A:** I use 3+ languages and CommandShift switches only between the last 2. How to make it cycle between all 3+ languages?
-* **Q:** Press and hold second key (the one you chose from the "Change language with..." drop-down) the then press Shift multiple times in order to cycle through your languages. 
-* **Q:** I want to switch language after releasing Shift key instead of when pressing it
-* **A:** From CommandShift's menu bar at the top-right you can toggle 'Change language after Shift release'
-* **Q:** I want to switch language by just pressing Shift key alone
-* **A:** From CommandShift's menu bar go to "Change language with..." drop-down and select "Shift"
-* **Q:** I want to hide CommandShift icon from menu tray
-* **A:** From CommandShift's menu bar select "Hide icon from tray menu..." and choose whether you want to hide it "Permanently" or "Until restart"
-* **Q:** I have Arm/Intel based Mac. Is CommandShift going to work on both? 
-* **A:** Yes, CommandShift is a universal app and runs natively on both Arm and Intel Macs.
+* **A:** Find CommandShift icon in menu bar and click it, there you'll find "Change language with..." drop-down
 
-# Downloads
+* **Q:** I get "CommandShift is damaged and can't be opened" error
+* **A:** Run this command in Terminal: `xattr -cr /Applications/CommandShift.app`
+
+* **Q:** I want to switch language after releasing Shift key instead of when pressing it
+* **A:** Toggle 'Change language after Shift release' from the menu
+
+* **Q:** I want to hide CommandShift icon from menu tray
+* **A:** Select "Tray menu icon..." → choose "Hide icon permanently" or "Hide icon until restart"
+
+* **Q:** I use 3+ languages and CommandShift switches only between the last 2
+* **A:** Press and hold the second key, then press Shift multiple times to cycle through all languages
+
+## Downloads
+
+### This Fork
+* [Releases](https://github.com/treshhh313/CommandShiftFN/releases) - Latest builds with Fn screenshot feature
+
+### Original CommandShift
 * Sourceforge: https://sourceforge.net/projects/commandshift/files/
 * GitHub: https://github.com/VasylBaran/CommandShift/releases/
 
-**Latest (v1.05) CommandShift checksum (MD5)**
-* CommandShift-universal.dmg: 4f27a503617766b62a8874a1a2edaa6f
+## Credits
 
-Again, if you have found CommandShift useful please consider supporting my endeavors. It encourages me to further improve, support and update CommandShift as new versions of MacOS come out:
-* **Buy Me a Coffee (Stripe) (one-time):** https://buymeacoffee.com/vasylbaran
-* **Patreon (monthly):** https://www.patreon.com/Vasyl_Baran
+This is a fork of the amazing **CommandShift** by [Vasyl Baran](https://github.com/VasylBaran).
 
-And remember, stay Safe and stay Strong! 🇺🇦
+**Original Author:** Vasyl Baran (Ukrainian software engineer)
+
+If you find CommandShift useful, please consider supporting the original author:
+* **Buy Me a Coffee:** https://buymeacoffee.com/vasylbaran
+* **Patreon:** https://www.patreon.com/Vasyl_Baran
+
+The original author's goal is $99 for Apple Developer program membership to properly sign and notarize CommandShift.
+
+## License
+
+Same license as the original CommandShift project (see [LICENSE](LICENSE)).
+
+---
+
+🇺🇦 **Stand with Ukraine!** Stay Safe and stay Strong!

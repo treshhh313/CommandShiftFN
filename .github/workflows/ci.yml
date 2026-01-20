@@ -1,0 +1,33 @@
+name: CI Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install Qt
+      run: |
+        brew install qt@5
+        echo "/usr/local/opt/qt@5/bin" >> $GITHUB_PATH
+    
+    - name: Build CommandShift
+      run: |
+        cd src
+        qmake CommandShift.pro
+        make
+    
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: CommandShift-app
+        path: src/CommandShift.app
+        retention-days: 7

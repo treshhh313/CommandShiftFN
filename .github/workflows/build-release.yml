@@ -1,0 +1,85 @@
+name: Build and Release DMG
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install Qt
+      run: |
+        brew install qt@5
+        echo "/usr/local/opt/qt@5/bin" >> $GITHUB_PATH
+    
+    - name: Build CommandShift
+      run: |
+        cd src
+        qmake CommandShift.pro
+        make
+    
+    - name: Create DMG
+      run: |
+        # Create temporary directory for DMG contents
+        mkdir -p dmg_contents
+        
+        # Copy built app to dmg contents
+        cp -R src/CommandShift.app dmg_contents/
+        
+        # Create symbolic link to Applications folder
+        ln -s /Applications dmg_contents/Applications
+        
+        # Create DMG
+        hdiutil create -volname "CommandShift" \
+          -srcfolder dmg_contents \
+          -ov -format UDZO \
+          CommandShift-universal.dmg
+    
+    - name: Calculate MD5
+      run: |
+        md5 CommandShift-universal.dmg | tee checksum.txt
+    
+    - name: Upload DMG artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: CommandShift-DMG
+        path: |
+          CommandShift-universal.dmg
+          checksum.txt
+    
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          CommandShift-universal.dmg
+          checksum.txt
+        body: |
+          ## CommandShift with Fn Screenshot Shortcuts
+          
+          ### New in this fork:
+          - ✨ **Fn key screenshot shortcuts**
+            - Short press (< 500ms): Command+Shift+4 (area screenshot)
+            - Long press (≥ 500ms): Command+Shift+5 (screenshot menu)
+          
+          ### Installation:
+          1. Download `CommandShift-universal.dmg`
+          2. Open the DMG and drag CommandShift to Applications
+          3. Add CommandShift to System Settings → Privacy & Security → Accessibility
+          4. Enable "Fn screenshot shortcuts" from the menu
+          
+          ### Checksums:
+          See `checksum.txt` for MD5 hash verification.
+          
+          ---
+          
+          Based on [VasylBaran/CommandShift](https://github.com/VasylBaran/CommandShift) 🇺🇦
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
