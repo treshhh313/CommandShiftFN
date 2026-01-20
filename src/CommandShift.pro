@@ -8,7 +8,7 @@ macx {
 
 CONFIG += c++11
 
-ICON = icons\icon.icns
+ICON = icons/icon.icns
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
