@@ -6,7 +6,7 @@ macx {
 QMAKE_APPLE_DEVICE_ARCHS = x86_64 arm64
 }
 
-CONFIG += c++11
+CONFIG += c++17
 
 ICON = icons\icon.icns
 
