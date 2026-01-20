@@ -26,34 +26,19 @@ jobs:
         export PATH="/usr/local/opt/qt@5/bin:/opt/homebrew/opt/qt@5/bin:$PATH"
         qmake CommandShift.pro
         make
-    
-    - name: Create DMG
-      run: |
-        # Create temporary directory for DMG contents
-        mkdir -p dmg_contents
-        
-        # Copy built app to dmg contents
-        cp -R src/CommandShift.app dmg_contents/
-        
-        # Create symbolic link to Applications folder
-        ln -s /Applications dmg_contents/Applications
-        
-        # Create DMG
-        hdiutil create -volname "CommandShift" \
-          -srcfolder dmg_contents \
-          -ov -format UDZO \
-          CommandShift-universal.dmg
+        # Bundle Qt libraries and create DMG
+        macdeployqt CommandShift.app -dmg
     
     - name: Calculate MD5
       run: |
-        md5 CommandShift-universal.dmg | tee checksum.txt
+        md5 src/CommandShift.dmg | tee checksum.txt
     
     - name: Upload DMG artifact
       uses: actions/upload-artifact@v4
       with:
         name: CommandShift-DMG
         path: |
-          CommandShift-universal.dmg
+          src/CommandShift.dmg
           checksum.txt
     
     - name: Create Release
@@ -61,7 +46,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          CommandShift-universal.dmg
+          src/CommandShift.dmg
           checksum.txt
         body: |
           ## CommandShift with Fn Screenshot Shortcuts
