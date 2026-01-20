@@ -73,6 +73,12 @@ make
 
 ### Fn Screenshot Feature
 
+* **Q:** I get "App is damaged and can't be opened" error
+* **A:** This is normal for unsigned apps. Run this in Terminal:
+  ```bash
+  sudo xattr -cr /path/to/CommandShift.app
+  ```
+
 * **Q:** Fn key is not triggering screenshots
 * **A:** Make sure the feature is enabled in the menu AND CommandShift has Accessibility permissions in System Settings
 
