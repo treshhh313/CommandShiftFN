@@ -10,9 +10,7 @@
 #include <QStandardPaths>
 #include <QSystemTrayIcon>
 #include <QUrl>
-
-#include <filesystem>
-
+#include <QDir>
 
 namespace
 {
@@ -27,9 +25,10 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QMenu menu;
 
-    auto homePath = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
-    auto settingsPath = std::filesystem::path(homePath.toStdString()) / ".config" / "commandShift.ini";
-    auto settings = new QSettings(QString::fromStdString(settingsPath.string()), QSettings::Format::IniFormat, &a);
+    auto homePath = QDir::homePath();
+    // Using QDir to construct path compatibly across platforms/versions
+    auto settingsPath = QDir(homePath).filePath(".config/commandShift.ini");
+    auto settings = new QSettings(settingsPath, QSettings::Format::IniFormat, &a);
 
     auto prefer_white_tray_icon = settings->value(s_white_tray_icon_preference_setting_name, false).toBool();
     auto systemTrayIcon = new QSystemTrayIcon(prefer_white_tray_icon ? QIcon(":/icons/trayicon_white.png") : QIcon(":/icons/trayicon.png"), &menu);
