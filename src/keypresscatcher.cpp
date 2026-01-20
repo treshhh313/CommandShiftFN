@@ -20,6 +20,9 @@ KeyPressCatcher::KeyPressCatcher(std::function<void (const QString& title, const
         }
     }
 
+    // Load Fn screenshot feature state
+    m_fn_screenshot_enabled = m_settings.value(CS::fnScreenshotEnabledSettingKeyword, false).toBool();
+
     m_successfully_started = init();
     m_accessibility_granted = AXIsProcessTrusted();
     if (!m_successfully_started || !m_accessibility_granted)
@@ -39,6 +42,7 @@ KeyPressCatcher::~KeyPressCatcher()
 {
     // Saving user preference
     m_settings.setValue(CS::secondShortcutKeySettingKeyword, m_secondShortcutKey);
+    m_settings.setValue(CS::fnScreenshotEnabledSettingKeyword, m_fn_screenshot_enabled);
 
     if (m_eventTapPtr != nullptr)
     {
@@ -78,6 +82,16 @@ void KeyPressCatcher::setChangeLanguageOnRelease(bool change_language_on_release
 bool KeyPressCatcher::changeLanguageOnRelease() const
 {
     return m_change_language_on_release;
+}
+
+void KeyPressCatcher::setFnScreenshotEnabled(bool enabled)
+{
+    m_fn_screenshot_enabled = enabled;
+}
+
+bool KeyPressCatcher::fnScreenshotEnabled() const
+{
+    return m_fn_screenshot_enabled;
 }
 
 void KeyPressCatcher::loop()
@@ -158,10 +172,28 @@ bool KeyPressCatcher::init()
                         {            
                            auto catcher = static_cast<KeyPressCatcher *>(keyPressCatcherRawPtr);
                            CGEventFlags flags = CGEventGetFlags(event);
+                           
+                           // Handle Fn key for screenshot shortcuts (if feature is enabled)
+                           if (catcher->fnScreenshotEnabled())
+                           {
+                               bool fn_currently_pressed = (flags & kCGEventFlagMaskSecondaryFn);
+                               bool was_fn_pressed = catcher->m_fn_key_pressed;
+                               
+                               // Fn key pressed down
+                               if (fn_currently_pressed && !was_fn_pressed)
+                               {
+                                   catcher->handleFnKeyPress();
+                               }
+                               // Fn key released
+                               else if (!fn_currently_pressed && was_fn_pressed)
+                               {
+                                   catcher->handleFnKeyRelease();
+                               }
+                           }
+                           
                            auto secondTriggerKey = catcher->getSecondShortcutKey();
                            // Checking whether a second key that we expected (depending on configuration) was pressed
-                           auto second_key_pressed_down = ((secondTriggerKey == CS::SecondShortcutKeyEnum::GlobalFN && flags & kCGEventFlagMaskSecondaryFn) ||
-                                                          (secondTriggerKey == CS::SecondShortcutKeyEnum::Control && flags & kCGEventFlagMaskControl) ||
+                           auto second_key_pressed_down = ((secondTriggerKey == CS::SecondShortcutKeyEnum::Control && flags & kCGEventFlagMaskControl) ||
                                                           (secondTriggerKey == CS::SecondShortcutKeyEnum::Option && flags & kCGEventFlagMaskAlternate) ||
                                                           (secondTriggerKey == CS::SecondShortcutKeyEnum::Command && flags & kCGEventFlagMaskCommand) ||
                                                           (secondTriggerKey == CS::SecondShortcutKeyEnum::Nothing));
@@ -182,4 +214,51 @@ bool KeyPressCatcher::init()
 
      CGEventTapEnable(m_eventTapPtr, true);
      return true;
+}
+
+void KeyPressCatcher::handleFnKeyPress()
+{
+    m_fn_key_pressed = true;
+    m_fn_press_start_time = std::chrono::steady_clock::now();
+}
+
+void KeyPressCatcher::handleFnKeyRelease()
+{
+    if (!m_fn_key_pressed)
+        return;
+        
+    m_fn_key_pressed = false;
+    
+    auto now = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_fn_press_start_time).count();
+    
+    // Short press: < 500ms -> Command+Shift+4
+    // Long press: >= 500ms -> Command+Shift+5
+    if (duration < 500)
+    {
+        sendScreenshotShortcut(0x15); // Key code for '4'
+    }
+    else
+    {
+        sendScreenshotShortcut(0x17); // Key code for '5'
+    }
+}
+
+void KeyPressCatcher::sendScreenshotShortcut(int keyCode)
+{
+    // Creating a 'Command + Shift + keyCode' event
+    CGEventSourceRef src = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
+    CGEventRef keyDown = CGEventCreateKeyboardEvent(src, keyCode, true);
+    CGEventRef keyUp = CGEventCreateKeyboardEvent(src, keyCode, false);
+
+    CGEventFlags flags = kCGEventFlagMaskCommand | kCGEventFlagMaskShift;
+    CGEventSetFlags(keyDown, flags);
+    CGEventSetFlags(keyUp, flags);
+
+    CGEventPost(kCGHIDEventTap, keyDown);
+    CGEventPost(kCGHIDEventTap, keyUp);
+
+    CFRelease(src);
+    CFRelease(keyDown);
+    CFRelease(keyUp);
 }

@@ -19,6 +19,7 @@ namespace
     constexpr static auto s_hide_tray_icon_setting_name = "tray_icon/hide";
     constexpr static auto s_change_language_on_release_setting_name = "language/trigger_on_key_release";
     constexpr static auto s_white_tray_icon_preference_setting_name = "tray_icon/white_tray_icon";
+    constexpr static auto s_fn_screenshot_enabled_setting_name = "fn_screenshot/enabled";
 }
 
 int main(int argc, char *argv[])
@@ -59,9 +60,6 @@ int main(int argc, char *argv[])
     auto secondShortcutKeyGroup = new QActionGroup(&menu);
     secondShortcutKeyGroup->setExclusive(true);
 
-    // 'Shift + FN' action
-    auto fnAction = new QAction("Shift + FN", secondShortcutKeyGroup);
-    fnAction->setCheckable(true);
     // 'Shift + Control' action
     auto controlAction = new QAction("Shift + Control", secondShortcutKeyGroup);
     controlAction->setCheckable(true);
@@ -77,9 +75,7 @@ int main(int argc, char *argv[])
 
     auto secondShortcutKey = catcher.getSecondShortcutKey();
     // Toggling currently selected shortcut
-    if (secondShortcutKey == CS::SecondShortcutKeyEnum::GlobalFN)
-        fnAction->toggle();
-    else if (secondShortcutKey == CS::SecondShortcutKeyEnum::Control)
+    if (secondShortcutKey == CS::SecondShortcutKeyEnum::Control)
         controlAction->toggle();
     else if (secondShortcutKey == CS::SecondShortcutKeyEnum::Option)
         optionAction->toggle();
@@ -89,14 +85,12 @@ int main(int argc, char *argv[])
         shiftAction->toggle();
 
     // Connections
-    QObject::connect(fnAction, &QAction::triggered, [&catcher] (bool checked) { if (checked) { catcher.setSecondShortcutKey(CS::GlobalFN); } });
     QObject::connect(controlAction, &QAction::triggered, [&catcher] (bool checked) { if (checked) { catcher.setSecondShortcutKey(CS::Control); } });
     QObject::connect(optionAction, &QAction::triggered, [&catcher] (bool checked) { if (checked) { catcher.setSecondShortcutKey(CS::Option); } });
     QObject::connect(commandAction, &QAction::triggered, [&catcher] (bool checked) { if (checked) {  catcher.setSecondShortcutKey(CS::Command); } });
     QObject::connect(shiftAction, &QAction::triggered, [&catcher] (bool checked) { if (checked) {  catcher.setSecondShortcutKey(CS::Nothing); } });
 
     // Adding actions to the group to make them mutually exclusive (group already owns them)
-    secondShortcutKeyGroup->addAction(fnAction);
     secondShortcutKeyGroup->addAction(controlAction);
     secondShortcutKeyGroup->addAction(optionAction);
     secondShortcutKeyGroup->addAction(commandAction);
@@ -104,7 +98,6 @@ int main(int argc, char *argv[])
 
     // Adding actions to drop-down menu
     auto secondShortcutKeyDropDownActionMenu = menu.addMenu("Change language with...");
-    secondShortcutKeyDropDownActionMenu->addAction(fnAction);
     secondShortcutKeyDropDownActionMenu->addAction(controlAction);
     secondShortcutKeyDropDownActionMenu->addAction(optionAction);
     secondShortcutKeyDropDownActionMenu->addAction(commandAction);
@@ -117,6 +110,15 @@ int main(int argc, char *argv[])
     changeLanguageOnKeyReleasedAction->setCheckable(true);
     changeLanguageOnKeyReleasedAction->setChecked(change_language_on_release);
     QObject::connect(changeLanguageOnKeyReleasedAction, &QAction::triggered, changeLanguageOnKeyReleasedAction, [&catcher, settings] { catcher.setChangeLanguageOnRelease(!catcher.changeLanguageOnRelease()); settings->setValue(s_change_language_on_release_setting_name, catcher.changeLanguageOnRelease()); });
+
+    // Fn screenshot shortcuts feature toggle
+    auto fn_screenshot_enabled = settings->value(s_fn_screenshot_enabled_setting_name, false).toBool();
+    catcher.setFnScreenshotEnabled(fn_screenshot_enabled);
+
+    auto fnScreenshotAction = menu.addAction("Enable Fn screenshot shortcuts");
+    fnScreenshotAction->setCheckable(true);
+    fnScreenshotAction->setChecked(fn_screenshot_enabled);
+    QObject::connect(fnScreenshotAction, &QAction::triggered, fnScreenshotAction, [&catcher, settings] { catcher.setFnScreenshotEnabled(!catcher.fnScreenshotEnabled()); settings->setValue(s_fn_screenshot_enabled_setting_name, catcher.fnScreenshotEnabled()); });
 
     auto trayIconGroup = new QActionGroup(&menu);
     trayIconGroup->setExclusive(false);

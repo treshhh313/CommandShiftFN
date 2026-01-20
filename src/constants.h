@@ -15,11 +15,11 @@ namespace CS
     static const auto privilegesLostMessage = QString("Unfortunately it seems that CommandShift has been removed from \"Security & Privacy -> Privacy -> Accessibility\" list");
 
     static const auto secondShortcutKeySettingKeyword = QString("SecondShortcutKey");
+    static const auto fnScreenshotEnabledSettingKeyword = QString("FnScreenshotEnabled");
 
     enum SecondShortcutKeyEnum
     {
     _FirstElem = 0,
-    GlobalFN,
     Control,
     Option,
     Command,
