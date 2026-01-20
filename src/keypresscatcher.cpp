@@ -236,11 +236,11 @@ void KeyPressCatcher::handleFnKeyRelease()
     // Long press: >= 500ms -> Command+Shift+5
     if (duration < 500)
     {
-        sendScreenshotShortcut(0x15); // Key code for '4'
+        sendScreenshotShortcut(0x17); // Key code for '5'
     }
     else
     {
-        sendScreenshotShortcut(0x17); // Key code for '5'
+        sendScreenshotShortcut(0x15); // Key code for '4'
     }
 }
 
