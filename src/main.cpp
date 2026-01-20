@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
     QObject::connect(changeLanguageOnKeyReleasedAction, &QAction::triggered, changeLanguageOnKeyReleasedAction, [&catcher, settings] { catcher.setChangeLanguageOnRelease(!catcher.changeLanguageOnRelease()); settings->setValue(s_change_language_on_release_setting_name, catcher.changeLanguageOnRelease()); });
 
     // Fn screenshot shortcuts feature toggle
-    auto fn_screenshot_enabled = settings->value(s_fn_screenshot_enabled_setting_name, false).toBool();
+    auto fn_screenshot_enabled = settings->value(s_fn_screenshot_enabled_setting_name, true).toBool();
     catcher.setFnScreenshotEnabled(fn_screenshot_enabled);
 
     auto fnScreenshotAction = menu.addAction("Enable Fn screenshot shortcuts");
