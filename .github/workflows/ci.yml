@@ -15,15 +15,13 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Install Qt
-      run: |
-        brew install qt@5
-        echo "/usr/local/opt/qt@5/bin" >> $GITHUB_PATH
-        echo "/opt/homebrew/opt/qt@5/bin" >> $GITHUB_PATH
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: '5.15.2'
     
     - name: Build CommandShift
       run: |
         cd src
-        export PATH="/usr/local/opt/qt@5/bin:/opt/homebrew/opt/qt@5/bin:$PATH"
         qmake CommandShift.pro
         make
         # Bundle Qt libraries
