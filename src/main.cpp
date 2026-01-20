@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QMenu>
+#include <QMessageBox>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QSystemTrayIcon>
@@ -44,10 +45,14 @@ int main(int argc, char *argv[])
 
     auto showMessageCallback = [systemTrayIcon](const QString& title, const QString& message)
     {
-        systemTrayIcon->showMessage(title,
-                                    message,
-                                    QIcon(),
-                                    30000);
+        if (title.contains("Accessibility")) {
+            QMessageBox::warning(nullptr, title, message);
+        } else {
+            systemTrayIcon->showMessage(title,
+                                        message,
+                                        QIcon(),
+                                        30000);
+        }
     };
 
     KeyPressCatcher catcher(showMessageCallback);
