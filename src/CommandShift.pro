@@ -3,7 +3,7 @@ QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 macx {
-QMAKE_APPLE_DEVICE_ARCHS = x86_64 arm64
+# QMAKE_APPLE_DEVICE_ARCHS = x86_64 arm64
 }
 
 CONFIG += c++11
